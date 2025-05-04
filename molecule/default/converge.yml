@@ -1,0 +1,11 @@
+---
+- name: Converge
+  become: no
+  hosts: all
+  gather_facts: false
+  
+  tasks:
+    - name: loki role
+      include_role:
+        name: loki
+

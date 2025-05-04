@@ -1,0 +1,46 @@
+---
+    - name: Loki | Ensure Python is installed
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python3)
+      changed_when: false
+
+    - name: Loki | Update package list
+      apt:
+        update_cache: yes
+
+    - name: Loki | Install unzip utility
+      apt:
+        name: unzip
+        state: present
+
+    - name: Loki | Download Loki zip file
+      get_url:
+        url: "{{ loki_url }}"
+        dest: "/tmp/loki-linux-arm64.zip"
+        mode: '0644'
+        validate_certs: no
+
+    - name: Loki | Unzip Loki
+      unarchive:
+        src: "/tmp/loki-linux-arm64.zip"
+        dest: "{{ loki_install_dir }}"
+        remote_src: yes
+
+    - name: Loki | Create Loki config directory
+      file:
+        path: "{{ loki_config_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Loki | Copy Loki configuration file from template
+      template:
+        src: "templates/loki-local-config.yaml.j2"
+        dest: "{{ loki_config_dir }}/{{ loki_config_file }}"
+        mode: '0644'
+        owner: root
+        group: root
+
+    - name: Loki | Start Loki in background using nohup
+      shell: nohup /usr/local/bin/loki-linux-arm64 -config.file=/etc/loki/loki-local-config.yaml > /usr/local/bin/loki.log 2>&1 &
+      async: 0
+      poll: 0
+
