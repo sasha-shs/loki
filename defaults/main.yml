@@ -10,8 +10,6 @@ loki_config_file: "loki-local-config.yaml"
 
 loki_url: "https://github.com/grafana/loki/releases/download/{{ loki_version }}/loki-linux-arm64.zip"
 
-positions_file: "/tmp/positions.yaml"
-
 loki_ports:
   http: 3100
   grpc: 9096
